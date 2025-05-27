@@ -1,1 +1,290 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Encabezado */
+header {
+    background-color: #004080;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+header .logo {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+header p {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Navegación */
+nav {
+    background-color: #00264d;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+nav ul li {
+    margin: 0.5rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    display: block;
+    transition: background 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #0059b3;
+    border-radius: 5px;
+}
+
+/* Banner */
+.banner {
+    background-image: url('images/banner.jpg'); /* Cambiar a tu imagen */
+    background-size: cover;
+    background-position: center;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    padding: 2rem;
+}
+
+.banner-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.banner-content p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    background-color: #004080;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0059b3;
+}
+
+/* Secciones generales */
+.section {
+    padding: 4rem 2rem;
+    background-color: white;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #004080;
+}
+
+/* Servicios */
+.services {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.service-card {
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.service-content {
+    padding: 1rem;
+}
+
+.service-content h3 {
+    color: #004080;
+    margin-bottom: 0.5rem;
+}
+
+/* Anuncios/Eventos */
+.announcements {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.announcement {
+    background-color: #eef6ff;
+    border-left: 6px solid #004080;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.announcement-date {
+    font-weight: bold;
+    color: #004080;
+}
+
+/* Equipo pastoral */
+.team {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.team-member {
+    text-align: center;
+    max-width: 300px;
+}
+
+.team-photo img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.team-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.team-role {
+    font-style: italic;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+/* Contacto */
+.contact-info {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.contact-methods {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 2rem;
+    gap: 2rem;
+}
+
+.contact-method {
+    background-color: #e6f0ff;
+    padding: 1rem;
+    border-radius: 8px;
+    flex: 1 1 250px;
+    text-align: center;
+}
+
+.contact-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.map {
+    margin-top: 2rem;
+    width: 100%;
+    height: 300px;
+}
+
+/* Footer */
+footer {
+    background-color: #00264d;
+    color: white;
+    padding: 2rem 1rem;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.footer-section h3 {
+    margin-bottom: 0.5rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.social-icon {
+    background-color: #004080;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.social-icon:hover {
+    background-color: #0059b3;
+}
+
+.copyright {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #ccc;
+}
 
