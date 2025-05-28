@@ -23,6 +23,76 @@
         </ul>
     </nav>
 
+    <!-- Botón flotante de donaciones -->
+    <button class="btn btn-donate" onclick="openDonationModal()">
+        💝 Donar
+    </button>
+
+    <!-- Modal de donaciones -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Realizar Donación</h2>
+                <button class="close-btn" onclick="closeDonationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="donation-methods">
+                    <div class="donation-method" onclick="selectMethod('yape')">
+                        <div class="method-icon yape">YAPE</div>
+                        <div class="method-info">
+                            <h3>Yape</h3>
+                            <p>Transferencia rápida desde tu app</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('plin')">
+                        <div class="method-icon plin">PLIN</div>
+                        <div class="method-info">
+                            <h3>Plin</h3>
+                            <p>Pago inmediato con tu celular</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('bcp')">
+                        <div class="method-icon bcp">BCP</div>
+                        <div class="method-info">
+                            <h3>BCP</h3>
+                            <p>Transferencia bancaria</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('interbank')">
+                        <div class="method-icon interbank">IBK</div>
+                        <div class="method-info">
+                            <h3>Interbank</h3>
+                            <p>Transferencia interbancaria</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('bbva')">
+                        <div class="method-icon bbva">BBVA</div>
+                        <div class="method-info">
+                            <h3>BBVA</h3>
+                            <p>Pago a través de BBVA</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('efectivo')">
+                        <div class="method-icon efectivo">💵</div>
+                        <div class="method-info">
+                            <h3>Efectivo</h3>
+                            <p>Donación en persona</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDonationModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="processDonation()">Continuar</button>
+            </div>
+        </div>
+    </div>
+
     <section class="banner" id="inicio">
         <div class="banner-content">
             <h1>Bienvenido a Iglesia Bautista Shaddai</h1>
@@ -160,5 +230,7 @@
             <p>&copy; 2025 Iglesia Bautista Shaddai. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
