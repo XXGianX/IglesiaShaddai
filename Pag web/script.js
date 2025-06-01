@@ -347,4 +347,5 @@ window.selectMethod = selectMethod;
 window.processDonation = processDonation;
 window.processDonationImproved = processDonationImproved;
 window.closeQRModal = closeQRModal;
+window.iniciarSesion = iniciarSesion;
 
