@@ -1,24 +1,38 @@
-<script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-      import { getAuth } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-      import { getFirestore } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+// Configuración e inicialización de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
+    authDomain: "iglesia-cc0ab.firebaseapp.com",
+    projectId: "iglesia-cc0ab",
+    storageBucket: "iglesia-cc0ab.appspot.com",
+    messagingSenderId: "888431233122",
+    appId: "1:888431233122:web:5d76b0966283b8ef08693b",
+    measurementId: "G-4V2T4W356X"
+};
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
-        authDomain: "iglesia-cc0ab.firebaseapp.com",
-        projectId: "iglesia-cc0ab",
-        storageBucket: "iglesia-cc0ab.appspot.com",
-        messagingSenderId: "888431233122",
-        appId: "1:888431233122:web:5d76b0966283b8ef08693b",
-        measurementId: "G-4V2T4W356X"
-      };
+// Variables para Firebase - se inicializarán cuando se cargue la librería
+let app, auth, db;
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-    </script>
 // Variables globales para el sistema de donaciones
 let selectedMethod = '';
+
+/**
+ * Inicializa Firebase una vez que se cargan los módulos
+ */
+async function initializeFirebase() {
+    try {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
+        const { getAuth } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
+        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+        
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        
+        console.log('Firebase inicializado correctamente');
+    } catch (error) {
+        console.error('Error al inicializar Firebase:', error);
+    }
+}
 
 /**
  * Abre el modal de donaciones
@@ -232,7 +246,7 @@ function resetSelection() {
 }
 
 /**
- * Función para navegación suave a las secciones (opcional)
+ * Función para navegación suave a las secciones
  * @param {string} sectionId - ID de la sección a la que navegar
  */
 function smoothScrollToSection(sectionId) {
@@ -244,46 +258,6 @@ function smoothScrollToSection(sectionId) {
         });
     }
 }
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
-    // Cerrar modal al hacer clic fuera del contenido
-    window.onclick = function(event) {
-        const modal = document.getElementById('donationModal');
-        const qrModal = document.getElementById('qrModal');
-        
-        if (event.target === modal) {
-            closeDonationModal();
-        }
-        if (event.target === qrModal) {
-            closeQRModal();
-        }
-    }
-
-    // Cerrar modal con la tecla Escape
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const modal = document.getElementById('donationModal');
-            const qrModal = document.getElementById('qrModal');
-            
-            if (qrModal && qrModal.style.display === 'block') {
-                closeQRModal();
-            } else if (modal && modal.style.display === 'block') {
-                closeDonationModal();
-            }
-        }
-    });
-
-    // Agregar navegación suave a los enlaces del menú (opcional)
-    const navLinks = document.querySelectorAll('nav a[href^="#"]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            smoothScrollToSection(targetId);
-        });
-    });
-});
 
 /**
  * Muestra un mensaje de confirmación antes de procesar la donación
@@ -326,29 +300,115 @@ function processDonationImproved() {
         processDonation();
     }
 }
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
+/**
+ * Función de inicio de sesión con Firebase
+ */
 async function iniciarSesion() {
     const email = document.getElementById("correo").value;
     const password = document.getElementById("clave").value;
 
+    if (!email || !password) {
+        document.getElementById("errorLogin").textContent = "Por favor completa todos los campos";
+        return;
+    }
+
     try {
+        // Importar la función de autenticación dinámicamente
+        const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
+        
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Inicio de sesión exitoso:', credenciales.user);
+        
         // Redirige a la página protegida
         window.location.href = "panel.html";
     } catch (error) {
-        document.getElementById("errorLogin").textContent = "Correo o contraseña incorrecta";
-        console.error(error);
+        console.error('Error de autenticación:', error);
+        
+        let errorMessage = "Error al iniciar sesión";
+        switch (error.code) {
+            case 'auth/invalid-email':
+                errorMessage = "Correo electrónico inválido";
+                break;
+            case 'auth/user-disabled':
+                errorMessage = "Usuario deshabilitado";
+                break;
+            case 'auth/user-not-found':
+                errorMessage = "Usuario no encontrado";
+                break;
+            case 'auth/wrong-password':
+                errorMessage = "Contraseña incorrecta";
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = "Demasiados intentos. Intenta más tarde";
+                break;
+            default:
+                errorMessage = "Correo o contraseña incorrecta";
+        }
+        
+        document.getElementById("errorLogin").textContent = errorMessage;
     }
 }
-document.addEventListener("DOMContentLoaded", () => {
-  window.openDonationModal = openDonationModal;
-  window.closeDonationModal = closeDonationModal;
-  window.selectMethod = selectMethod;
-  window.processDonation = processDonation;
-  window.processDonationImproved = processDonationImproved;
-  window.closeQRModal = closeQRModal;
-  window.iniciarSesion = iniciarSesion;
+
+// Event Listeners y inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Firebase
+    initializeFirebase();
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.onclick = function(event) {
+        const modal = document.getElementById('donationModal');
+        const qrModal = document.getElementById('qrModal');
+        
+        if (event.target === modal) {
+            closeDonationModal();
+        }
+        if (event.target === qrModal) {
+            closeQRModal();
+        }
+    };
+
+    // Cerrar modal con la tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('donationModal');
+            const qrModal = document.getElementById('qrModal');
+            
+            if (qrModal && qrModal.style.display === 'block') {
+                closeQRModal();
+            } else if (modal && modal.style.display === 'block') {
+                closeDonationModal();
+            }
+        }
+    });
+
+    // Agregar navegación suave a los enlaces del menú
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            smoothScrollToSection(targetId);
+        });
+    });
+
+    // Event listener para el formulario de login si existe
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            iniciarSesion();
+        });
+    }
 });
 
+// Exponer funciones necesarias globalmente para uso en HTML
+window.openDonationModal = openDonationModal;
+window.closeDonationModal = closeDonationModal;
+window.selectMethod = selectMethod;
+window.processDonation = processDonation;
+window.processDonationImproved = processDonationImproved;
+window.closeQRModal = closeQRModal;
+window.iniciarSesion = iniciarSesion;
+window.smoothScrollToSection = smoothScrollToSection;
 
