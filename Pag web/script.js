@@ -1,3 +1,22 @@
+<script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+      import { getAuth } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
+        authDomain: "iglesia-cc0ab.firebaseapp.com",
+        projectId: "iglesia-cc0ab",
+        storageBucket: "iglesia-cc0ab.appspot.com",
+        messagingSenderId: "888431233122",
+        appId: "1:888431233122:web:5d76b0966283b8ef08693b",
+        measurementId: "G-4V2T4W356X"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+    </script>
 // Variables globales para el sistema de donaciones
 let selectedMethod = '';
 
