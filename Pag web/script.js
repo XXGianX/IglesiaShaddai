@@ -307,3 +307,18 @@ function processDonationImproved() {
         processDonation();
     }
 }
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+async function iniciarSesion() {
+    const email = document.getElementById("correo").value;
+    const password = document.getElementById("clave").value;
+
+    try {
+        const credenciales = await signInWithEmailAndPassword(auth, email, password);
+        // Redirige a la página protegida
+        window.location.href = "panel.html";
+    } catch (error) {
+        document.getElementById("errorLogin").textContent = "Correo o contraseña incorrecta";
+        console.error(error);
+    }
+}
