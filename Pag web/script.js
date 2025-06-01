@@ -341,3 +341,10 @@ async function iniciarSesion() {
         console.error(error);
     }
 }
+window.openDonationModal = openDonationModal;
+window.closeDonationModal = closeDonationModal;
+window.selectMethod = selectMethod;
+window.processDonation = processDonation;
+window.processDonationImproved = processDonationImproved;
+window.closeQRModal = closeQRModal;
+
