@@ -1,3 +1,45 @@
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('inventory-form');
+    const tableBody = document.querySelector('#inventory-table tbody');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const item = {
+        nombre: document.getElementById('item-nombre').value,
+        descripcion: document.getElementById('item-descripcion').value,
+        cantidad: document.getElementById('item-cantidad').value,
+        valor: document.getElementById('item-valor').value,
+        categoria: document.getElementById('item-categoria').value,
+        ubicacion: document.getElementById('item-ubicacion').value,
+        estado: document.getElementById('item-estado').value,
+        responsable: document.getElementById('item-responsable').value,
+        compra: document.getElementById('item-compra').value
+      };
+
+      const row = document.createElement('tr');
+      for (let key in item) {
+        const cell = document.createElement('td');
+        cell.textContent = item[key];
+        row.appendChild(cell);
+      }
+
+      tableBody.appendChild(row);
+      form.reset();
+    });
+
+    // Mostrar panel de inventario después de iniciar sesión
+    function mostrarInventario() {
+      document.getElementById('inventory-panel').style.display = 'block';
+    }
+
+    // Simula sesión
+    if (true) { // reemplaza esto por tu lógica de autenticación
+      mostrarInventario();
+    }
+  });
+</script>
 // Configuración e inicialización de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
