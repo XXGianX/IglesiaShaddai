@@ -668,4 +668,36 @@ footer {
 .login-container button {
   padding: 10px 20px;
 }
+.inventory-form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.inventory-form input,
+.inventory-form textarea,
+.inventory-form select {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+#inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#inventory-table th,
+#inventory-table td {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
 
