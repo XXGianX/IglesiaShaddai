@@ -453,4 +453,18 @@ window.processDonationImproved = processDonationImproved;
 window.closeQRModal = closeQRModal;
 window.iniciarSesion = iniciarSesion;
 window.smoothScrollToSection = smoothScrollToSection;
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+const auth = getAuth();
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Usuario autenticado, muestra el panel
+    document.getElementById("inventory-panel").style.display = "block";
+  } else {
+    // Usuario no autenticado, redirige o esconde panel
+    document.getElementById("inventory-panel").style.display = "none";
+    window.location.href = "login.html"; // opcional
+  }
+});
 
