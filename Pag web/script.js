@@ -1,45 +1,3 @@
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('inventory-form');
-    const tableBody = document.querySelector('#inventory-table tbody');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const item = {
-        nombre: document.getElementById('item-nombre').value,
-        descripcion: document.getElementById('item-descripcion').value,
-        cantidad: document.getElementById('item-cantidad').value,
-        valor: document.getElementById('item-valor').value,
-        categoria: document.getElementById('item-categoria').value,
-        ubicacion: document.getElementById('item-ubicacion').value,
-        estado: document.getElementById('item-estado').value,
-        responsable: document.getElementById('item-responsable').value,
-        compra: document.getElementById('item-compra').value
-      };
-
-      const row = document.createElement('tr');
-      for (let key in item) {
-        const cell = document.createElement('td');
-        cell.textContent = item[key];
-        row.appendChild(cell);
-      }
-
-      tableBody.appendChild(row);
-      form.reset();
-    });
-
-    // Mostrar panel de inventario después de iniciar sesión
-    function mostrarInventario() {
-      document.getElementById('inventory-panel').style.display = 'block';
-    }
-
-    // Simula sesión
-    if (true) { // reemplaza esto por tu lógica de autenticación
-      mostrarInventario();
-    }
-  });
-</script>
 // Configuración e inicialización de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
@@ -63,7 +21,7 @@ let selectedMethod = '';
 async function initializeFirebase() {
     try {
         const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
-        const { getAuth } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
+        const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
         const { getFirestore } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
         
         app = initializeApp(firebaseConfig);
@@ -71,6 +29,27 @@ async function initializeFirebase() {
         db = getFirestore(app);
         
         console.log('Firebase inicializado correctamente');
+        
+        // Manejar estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            const inventoryPanel = document.getElementById("inventory-panel");
+            if (user) {
+                // Usuario autenticado, muestra el panel
+                if (inventoryPanel) {
+                    inventoryPanel.style.display = "block";
+                }
+            } else {
+                // Usuario no autenticado, esconde panel
+                if (inventoryPanel) {
+                    inventoryPanel.style.display = "none";
+                }
+                // Solo redirigir si estamos en panel.html
+                if (window.location.pathname.includes('panel.html')) {
+                    window.location.href = "login.html";
+                }
+            }
+        });
+        
     } catch (error) {
         console.error('Error al inicializar Firebase:', error);
     }
@@ -80,17 +59,25 @@ async function initializeFirebase() {
  * Abre el modal de donaciones
  */
 function openDonationModal() {
-    document.getElementById('donationModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    const modal = document.getElementById('donationModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    } else {
+        console.error('Modal de donaciones no encontrado');
+    }
 }
 
 /**
  * Cierra el modal de donaciones
  */
 function closeDonationModal() {
-    document.getElementById('donationModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    resetSelection();
+    const modal = document.getElementById('donationModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        resetSelection();
+    }
 }
 
 /**
@@ -104,8 +91,11 @@ function selectMethod(method) {
     const methodCards = document.querySelectorAll('.donation-method');
     methodCards.forEach(card => card.classList.remove('selected'));
     
-    // Agregar selección actual
-    event.target.closest('.donation-method').classList.add('selected');
+    // Agregar selección actual - buscar el card que fue clickeado
+    const clickedCard = document.querySelector(`[onclick*="${method}"]`);
+    if (clickedCard) {
+        clickedCard.classList.add('selected');
+    }
 }
 
 /**
@@ -114,17 +104,30 @@ function selectMethod(method) {
  * @param {string} qrImageUrl - URL de la imagen QR
  */
 function showQRModal(message, qrImageUrl) {
+    // Remover modal existente si existe
+    const existingModal = document.getElementById('qrModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
     // Crear el modal personalizado
     const qrModal = document.createElement('div');
     qrModal.className = 'modal';
     qrModal.id = 'qrModal';
     qrModal.style.display = 'block';
+    qrModal.style.position = 'fixed';
+    qrModal.style.zIndex = '1000';
+    qrModal.style.left = '0';
+    qrModal.style.top = '0';
+    qrModal.style.width = '100%';
+    qrModal.style.height = '100%';
+    qrModal.style.backgroundColor = 'rgba(0,0,0,0.5)';
     
     qrModal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2>¡Gracias por tu Donación! 💝</h2>
-                <button class="close-btn" onclick="closeQRModal()">&times;</button>
+        <div class="modal-content" style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 10px; max-width: 600px; position: relative;">
+            <div class="modal-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #2c5393;">¡Gracias por tu Donación! 💝</h2>
+                <button class="close-btn" onclick="closeQRModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
             </div>
             <div class="modal-body" style="text-align: center;">
                 <div style="margin-bottom: 2rem;">
@@ -133,7 +136,11 @@ function showQRModal(message, qrImageUrl) {
                     </h3>
                     <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
                         <img src="${qrImageUrl}" alt="Código QR para ${getMethodName(selectedMethod)}" 
-                             style="max-width: 250px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                             style="max-width: 250px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; padding: 20px; color: #666;">
+                            Imagen QR no disponible
+                        </div>
                     </div>
                     <div style="text-align: left; background-color: #e8f4f8; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2c5393;">
                         <pre style="white-space: pre-wrap; font-family: 'Segoe UI', sans-serif; margin: 0; line-height: 1.6;">${message}</pre>
@@ -143,8 +150,8 @@ function showQRModal(message, qrImageUrl) {
                     <strong>Nota:</strong> Escanea el código QR con tu aplicación de pago o sigue las instrucciones detalladas.
                 </p>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeQRModal()" style="width: 100%;">
+            <div class="modal-footer" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
+                <button onclick="closeQRModal()" style="width: 100%; padding: 12px; background-color: #2c5393; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
                     Entendido
                 </button>
             </div>
@@ -349,15 +356,22 @@ function processDonationImproved() {
 async function iniciarSesion() {
     const email = document.getElementById("correo").value;
     const password = document.getElementById("clave").value;
+    const errorElement = document.getElementById("errorLogin");
 
     if (!email || !password) {
-        document.getElementById("errorLogin").textContent = "Por favor completa todos los campos";
+        if (errorElement) {
+            errorElement.textContent = "Por favor completa todos los campos";
+        }
         return;
     }
 
     try {
         // Importar la función de autenticación dinámicamente
         const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
+        
+        if (!auth) {
+            throw new Error('Firebase no está inicializado');
+        }
         
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
         console.log('Inicio de sesión exitoso:', credenciales.user);
@@ -384,11 +398,52 @@ async function iniciarSesion() {
             case 'auth/too-many-requests':
                 errorMessage = "Demasiados intentos. Intenta más tarde";
                 break;
+            case 'auth/network-request-failed':
+                errorMessage = "Error de conexión. Verifica tu internet";
+                break;
             default:
                 errorMessage = "Correo o contraseña incorrecta";
         }
         
-        document.getElementById("errorLogin").textContent = errorMessage;
+        if (errorElement) {
+            errorElement.textContent = errorMessage;
+        }
+    }
+}
+
+/**
+ * Función para el sistema de inventario
+ */
+function initializeInventorySystem() {
+    const form = document.getElementById('inventory-form');
+    const tableBody = document.querySelector('#inventory-table tbody');
+
+    if (form && tableBody) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const item = {
+                nombre: document.getElementById('item-nombre').value,
+                descripcion: document.getElementById('item-descripcion').value,
+                cantidad: document.getElementById('item-cantidad').value,
+                valor: document.getElementById('item-valor').value,
+                categoria: document.getElementById('item-categoria').value,
+                ubicacion: document.getElementById('item-ubicacion').value,
+                estado: document.getElementById('item-estado').value,
+                responsable: document.getElementById('item-responsable').value,
+                compra: document.getElementById('item-compra').value
+            };
+
+            const row = document.createElement('tr');
+            for (let key in item) {
+                const cell = document.createElement('td');
+                cell.textContent = item[key];
+                row.appendChild(cell);
+            }
+
+            tableBody.appendChild(row);
+            form.reset();
+        });
     }
 }
 
@@ -396,6 +451,9 @@ async function iniciarSesion() {
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar Firebase
     initializeFirebase();
+    
+    // Inicializar sistema de inventario
+    initializeInventorySystem();
 
     // Cerrar modal al hacer clic fuera del contenido
     window.onclick = function(event) {
@@ -453,14 +511,3 @@ window.processDonationImproved = processDonationImproved;
 window.closeQRModal = closeQRModal;
 window.iniciarSesion = iniciarSesion;
 window.smoothScrollToSection = smoothScrollToSection;
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Usuario autenticado, muestra el panel
-    document.getElementById("inventory-panel").style.display = "block";
-  } else {
-    // Usuario no autenticado, redirige o esconde panel
-    document.getElementById("inventory-panel").style.display = "none";
-    window.location.href = "login.html"; // opcional
-  }
-});
-
