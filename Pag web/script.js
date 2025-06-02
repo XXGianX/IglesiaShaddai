@@ -453,10 +453,6 @@ window.processDonationImproved = processDonationImproved;
 window.closeQRModal = closeQRModal;
 window.iniciarSesion = iniciarSesion;
 window.smoothScrollToSection = smoothScrollToSection;
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
-const auth = getAuth();
-
 onAuthStateChanged(auth, (user) => {
   if (user) {
     // Usuario autenticado, muestra el panel
