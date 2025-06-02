@@ -212,7 +212,59 @@
             </div>
         </section>
     </main>
+<!-- Sistema de Inventario (solo se muestra después del login) -->
+<main id="inventory-panel" style="display: none;">
+  <section class="section">
+    <h2 class="section-title">Sistema de Inventario</h2>
+    <form id="inventory-form" class="inventory-form">
+      <input type="text" placeholder="Nombre" id="item-nombre" required />
+      <textarea placeholder="Descripción" id="item-descripcion" required></textarea>
+      <input type="number" placeholder="Cantidad" id="item-cantidad" required />
+      <input type="number" placeholder="Valor Unitario" id="item-valor" required />
 
+      <select id="item-categoria" required>
+        <option value="">Seleccione Categoría</option>
+        <option value="mueble">Mueble</option>
+        <option value="inmueble">Inmueble</option>
+      </select>
+
+      <input type="text" placeholder="Ubicación" id="item-ubicacion" required />
+
+      <select id="item-estado" required>
+        <option value="">Seleccione Estado</option>
+        <option value="disponible">Disponible</option>
+        <option value="no_disponible">No Disponible</option>
+      </select>
+
+      <input type="text" placeholder="Responsable" id="item-responsable" required />
+
+      <select id="item-compra" required>
+        <option value="">Tipo de Compra</option>
+        <option value="donado">Donado</option>
+        <option value="comprado">Comprado</option>
+      </select>
+
+      <button type="submit" class="btn">Guardar</button>
+    </form>
+
+    <table id="inventory-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Valor Unitario</th>
+          <th>Categoría</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Responsable</th>
+          <th>Tipo de Compra</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
     <footer>
         <div class="footer-content">
             <div class="footer-section">
