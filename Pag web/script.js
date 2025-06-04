@@ -11,11 +11,6 @@ function closeDonationModal() {
     document.body.style.overflow = 'auto';
     resetSelection();
 }
-
-/**
- * Selecciona un método de pago
- * @param {string} method - Método de pago seleccionado
- */
 function selectMethod(method) {
     selectedMethod = method;
     
@@ -24,12 +19,6 @@ function selectMethod(method) {
     
     event.target.closest('.donation-method').classList.add('selected');
 }
-
-/**
- * Crea y muestra un modal personalizado con imagen QR
- * @param {string} message - Mensaje a mostrar
- * @param {string} qrImageUrl - URL de la imagen QR
- */
 function showQRModal(message, qrImageUrl) {
     const qrModal = document.createElement('div');
     qrModal.className = 'modal';
@@ -80,11 +69,6 @@ function closeQRModal() {
     }
 }
 
-/**
- * Obtiene la URL de la imagen QR según el método de pago
- * @param {string} method - Método de pago
- * @returns {string} URL de la imagen QR (solo para Yape y Plin)
- */
 function getQRImageUrl(method) {
     const qrUrls = {
         'yape': 'images/qr-yape.png',
@@ -168,11 +152,6 @@ function processDonation() {
     closeDonationModal();
 }
 
-/**
- * Obtiene el nombre legible del método de pago
- * @param {string} method - Código del método de pago
- * @returns {string} Nombre del método de pago
- */
 function getMethodName(method) {
     const names = {
         'yape': 'Yape',
@@ -192,10 +171,7 @@ function resetSelection() {
     methodCards.forEach(card => card.classList.remove('selected'));
 }
 
-/**
- * Función para navegación suave a las secciones (opcional)
- * @param {string} sectionId - ID de la sección a la que navegar
- */
+
 function smoothScrollToSection(sectionId) {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -242,18 +218,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/**
- * Muestra un mensaje de confirmación antes de procesar la donación
- * @returns {boolean} true si el usuario confirma, false en caso contrario
- */
 function confirmDonation() {
     return confirm(`¿Estás seguro de que deseas proceder con la donación mediante ${getMethodName(selectedMethod)}?`);
 }
-
-/**
- * Valida que el método de pago esté seleccionado
- * @returns {Object} Objeto con validación y mensaje de error si existe
- */
 function validateDonationData() {
     if (!selectedMethod) {
         return {
@@ -267,10 +234,6 @@ function validateDonationData() {
         message: ''
     };
 }
-
-/**
- * Versión mejorada del procesamiento de donaciones con validación
- */
 function processDonationImproved() {
     const validation = validateDonationData();
     
