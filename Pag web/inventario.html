@@ -6,6 +6,7 @@
   <title>Sistema de Inventario</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
   <style>
     body {
       font-family: Arial;
@@ -13,7 +14,7 @@
       padding: 30px;
       text-align: center;
     }
-    .formulario, .tabla {
+    .formulario, .tabla, .login {
       background: #fff;
       padding: 20px;
       margin: 20px auto;
@@ -46,7 +47,15 @@
 </head>
 <body>
   <h2>Sistema de Inventario</h2>
-  <div class="formulario">
+
+  <div class="login" id="login">
+    <h3>Iniciar sesión</h3>
+    <input type="email" id="email" placeholder="Correo">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <div class="formulario" id="formularioSeccion" style="display:none;">
     <h3>Agregar ítem</h3>
     <form id="formulario">
       <input type="text" id="nombre" placeholder="Nombre" required>
@@ -68,7 +77,7 @@
     </form>
   </div>
 
-  <div class="tabla">
+  <div class="tabla" id="tablaSeccion" style="display:none;">
     <h3>Lista de ítems</h3>
     <table border="1" width="100%">
       <thead>
@@ -90,8 +99,10 @@
   appId: "1:888431233122:web:5d76b0966283b8ef08693b",
   measurementId: "G-4V2T4W356X"
 };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const auth = firebase.auth();
   const itemsRef = db.collection("inventario");
 
   const formulario = document.getElementById("formulario");
@@ -158,9 +169,34 @@
     itemsRef.doc(id).delete();
   }
 
-  itemsRef.onSnapshot(snapshot => {
-    listaItems.innerHTML = "";
-    snapshot.forEach(doc => renderItem(doc));
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then(user => {
+        if (email === "crisologo@shaddai.com") {
+          document.getElementById("login").style.display = "none";
+          document.getElementById("formularioSeccion").style.display = "block";
+          document.getElementById("tablaSeccion").style.display = "block";
+        } else {
+          alert("No tienes permisos para acceder.");
+          auth.signOut();
+        }
+      })
+      .catch(err => alert("Error de autenticación: " + err.message));
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (user && user.email === "crisologo@shaddai.com") {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("formularioSeccion").style.display = "block";
+      document.getElementById("tablaSeccion").style.display = "block";
+
+      itemsRef.onSnapshot(snapshot => {
+        listaItems.innerHTML = "";
+        snapshot.forEach(doc => renderItem(doc));
+      });
+    }
   });
 </script>
 </body>
