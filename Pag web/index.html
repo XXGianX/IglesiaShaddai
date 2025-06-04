@@ -1,19 +1,295 @@
-<!DOCTYPE html>
+<!DOCTYPE html>Add commentMore actions
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iglesia Bautista Shaddai</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="login-container">
-    <h2>Iniciar sesión</h2>
-    <input type="email" id="email" placeholder="Correo electrónico" />
-    <input type="password" id="password" placeholder="Contraseña" />
-    <button onclick="login()">Ingresar</button>
-    <p id="login-error" class="error-text"></p>
-  </div>
-  <script type="module" src="script.js"></script>
+    <div id="login-section" class="login-container">
+        <h2>Iniciar Sesión</h2>
+          <input type="email" id="correo" placeholder="Correo electrónico">
+          <input type="password" id="clave" placeholder="Contraseña">
+      <button onclick="iniciarSesion()">Ingresar</button>
+      <p id="errorLogin" style="color:red;"></p>
+    </div>
+    <header>
+        <div class="logo">Iglesia Bautista Shaddai</div>
+        <p>Un lugar de fe, esperanza y amor</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#eventos">Eventos</a></li>
+            <li><a href="#equipo">Equipo Pastoral</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <!-- Botón flotante de donaciones -->
+    <button class="btn btn-donate" onclick="openDonationModal()">
+        💝 Donar
+    </button>
+
+    <!-- Modal de donaciones -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Realizar Donación</h2>
+                <button class="close-btn" onclick="closeDonationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="donation-methods">
+                    <div class="donation-method" onclick="selectMethod('yape')">
+                        <div class="method-icon yape">YAPE</div>
+                        <div class="method-info">
+                            <h3>Yape</h3>
+                            <p>Transferencia rápida desde tu app</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('plin')">
+                        <div class="method-icon plin">PLIN</div>
+                        <div class="method-info">
+                            <h3>Plin</h3>
+                            <p>Pago inmediato con tu celular</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('bcp')">
+                        <div class="method-icon bcp">BCP</div>
+                        <div class="method-info">
+                            <h3>BCP</h3>
+                            <p>Transferencia bancaria</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('interbank')">
+                        <div class="method-icon interbank">IBK</div>
+                        <div class="method-info">
+                            <h3>Interbank</h3>
+                            <p>Transferencia interbancaria</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('bbva')">
+                        <div class="method-icon bbva">BBVA</div>
+                        <div class="method-info">
+                            <h3>BBVA</h3>
+                            <p>Pago a través de BBVA</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-method" onclick="selectMethod('efectivo')">
+                        <div class="method-icon efectivo">💵</div>
+                        <div class="method-info">
+                            <h3>Efectivo</h3>
+                            <p>Donación en persona</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDonationModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="processDonation()">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="banner" id="inicio">
+        <div class="banner-content">
+            <h1>Bienvenido a Iglesia Bautista Shaddai</h1>
+            <p>Somos una comunidad de fe comprometida con compartir el amor de Dios y servir a nuestra comunidad. Te invitamos a unirte a nosotros en nuestro próximo servicio.</p>
+            <a href="#servicios" class="btn">Horarios de Servicios</a>
+        </div>
+    </section>
+
+    <main>
+        <section class="section" id="nosotros">
+            <h2 class="section-title">Quiénes Somos</h2>
+            <div class="announcements">
+                <p>Nuestra iglesia se fundó con la misión de crear un espacio acogedor donde todos puedan experimentar el amor de Dios y crecer en su fe. Durante más de 27 años, hemos servido a nuestra comunidad a través de diversos ministerios y actividades.</p>
+                <p>Creemos en la importancia de la comunidad, el servicio y el crecimiento espiritual. Nuestra visión es ser una iglesia que transforma vidas y restaura familias a través del mensaje del evangelio.</p>
+                <p>Todos son bienvenidos en nuestra comunidad, sin importar su origen, pasado o circunstancias actuales. Te invitamos a conocernos y ser parte de nuestra familia.</p>
+            </div>
+        </section>
+
+        <section class="section" id="servicios">
+            <h2 class="section-title">Nuestros Servicios</h2>
+            <div class="services">
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="images/servicio-dominical.jpg" alt="Servicio Dominical">
+                    </div>
+                    <div class="service-content">
+                        <h3>Servicio Dominical</h3>
+                        <p><strong>Horario:</strong> Domingos 10:00 AM</p>
+                        <p>Nuestro servicio principal, con alabanza, oración y enseñanza de la Palabra de Dios para toda la familia.</p>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="images/estudio-biblico.jpg" alt="Estudio Bíblico">
+                    </div>
+                    <div class="service-content">
+                        <h3>Estudio Bíblico</h3>
+                        <p><strong>Horario:</strong> Miércoles 7:00 PM</p>
+                        <p>Un espacio para profundizar en las escrituras y crecer en conocimiento y fe.</p>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="images/jovenes.jpg" alt="Reunión de Jóvenes">
+                    </div>
+                    <div class="service-content">
+                        <h3>Reunión de Jóvenes</h3>
+                        <p><strong>Horario:</strong> Viernes 7:00 PM</p>
+                        <p>Un tiempo de comunión, diversión y crecimiento espiritual para adolescentes y jóvenes adultos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="eventos">
+            <h2 class="section-title">Próximos Eventos</h2>
+            <div class="announcements">
+                <div class="announcement">
+                    <h3>Misa Especial de Acción de Gracias</h3>
+                    <p class="announcement-date">15 de Mayo, 2025</p>
+                    <p>Te invitamos a nuestra misa especial de acción de gracias donde celebraremos las bendiciones recibidas. La ceremonia comenzará a las 10:00 AM en nuestro templo principal.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="equipo">
+            <h2 class="section-title">Nuestro Equipo Pastoral</h2>
+            <div class="team">
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="images/pastor.jpg" alt="Pastor Crisólogo Enríquez">
+                    </div>
+                    <p class="team-name">Crisólogo Enríquez</p>
+                    <p class="team-role">Pastor Principal</p>
+                    <p>Liderando nuestra congregación con sabiduría y dedicación, el Pastor Crisólogo guía a nuestra comunidad con un corazón de servicio.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="contacto">
+            <h2 class="section-title">Contáctanos</h2>
+            <div class="contact-info">
+                <p>Estamos aquí para responder tus preguntas y ayudarte a conectar con nuestra comunidad. No dudes en contactarnos a través de cualquiera de estos medios:</p>
+                
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <div class="contact-icon">📍</div>
+                        <h3>Dirección</h3>
+                        <p>Calle Principal #123<br>Ciudad, CP 12345</p>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <div class="contact-icon">📞</div>
+                        <h3>Teléfono</h3>
+                        <p>958 685 460<br>Lunes a Viernes: 9AM - 5PM</p>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <div class="contact-icon">✉️</div>
+                        <h3>Email</h3>
+                        <p>info@iglesiabautistashaddai.org</p>
+                    </div>
+                </div>
+                
+                <div class="map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!4v1747178854463!6m8!1m7!1s__bfZ-edkavyTQzju6yHVA!2m2!1d-16.36691706576918!2d-71.51655877718845!3f166.09879446446018!4f-15.471211882746047!5f0.7820865974627469" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+<!-- Sistema de Inventario (solo se muestra después del login) -->
+<main id="inventory-panel" style="display: none;">
+  <section class="section">
+    <h2 class="section-title">Sistema de Inventario</h2>
+    <form id="inventory-form" class="inventory-form">
+      <input type="text" placeholder="Nombre" id="item-nombre" required />
+      <textarea placeholder="Descripción" id="item-descripcion" required></textarea>
+      <input type="number" placeholder="Cantidad" id="item-cantidad" required />
+      <input type="number" placeholder="Valor Unitario" id="item-valor" required />
+
+      <select id="item-categoria" required>
+        <option value="">Seleccione Categoría</option>
+        <option value="mueble">Mueble</option>
+        <option value="inmueble">Inmueble</option>
+      </select>
+
+      <input type="text" placeholder="Ubicación" id="item-ubicacion" required />
+
+      <select id="item-estado" required>
+        <option value="">Seleccione Estado</option>
+        <option value="disponible">Disponible</option>
+        <option value="no_disponible">No Disponible</option>
+      </select>
+
+      <input type="text" placeholder="Responsable" id="item-responsable" required />
+
+      <select id="item-compra" required>
+        <option value="">Tipo de Compra</option>
+        <option value="donado">Donado</option>
+        <option value="comprado">Comprado</option>
+      </select>
+
+      <button type="submit" class="btn">Guardar</button>
+    </form>
+
+    <table id="inventory-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Valor Unitario</th>
+          <th>Categoría</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Responsable</th>
+          <th>Tipo de Compra</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Iglesia Bautista Shaddai</h3>
+                <p>Un lugar de fe, esperanza y amor donde todos son bienvenidos.</p>
+                <div class="social-links">
+                    <a href="#" class="social-icon">FB</a>
+                    <a href="#" class="social-icon">IG</a>
+                    <a href="#" class="social-icon">YT</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Horarios</h3>
+                <p><strong>Servicio Dominical:</strong><br>10:00 AM</p>
+                <p><strong>Estudio Bíblico:</strong><br>Miércoles 7:00 PM</p>
+                <p><strong>Jóvenes:</strong><br>Viernes 7:00 PM</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2025 Iglesia Bautista Shaddai. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    <script type="module" src="script.js"></script>
+    
 </body>
 </html>
