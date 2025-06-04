@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel de Administración</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
+      authDomain: "iglesia-cc0ab.firebaseapp.com",
+      projectId: "iglesia-cc0ab",
+      storageBucket: "iglesia-cc0ab.appspot.com",
+      messagingSenderId: "888431233122",
+      appId: "1:888431233122:web:5d76b0966283b8ef08693b",
+      measurementId: "G-4V2T4W356X"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    async function agregarDato() {
+      const nombre = document.getElementById("nombre").value;
+      await addDoc(collection(db, "miembros"), { nombre });
+      cargarDatos();
+    }
+
+    async function cargarDatos() {
+      const contenedor = document.getElementById("lista");
+      contenedor.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "miembros"));
+      querySnapshot.forEach((docSnap) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <strong>${docSnap.data().nombre}</strong>
+          <button onclick="eliminarDato('${docSnap.id}')">Eliminar</button>
+          <button onclick="modificarDato('${docSnap.id}')">Modificar</button>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    window.eliminarDato = async function(id) {
+      await deleteDoc(doc(db, "miembros", id));
+      cargarDatos();
+    }
+
+    window.modificarDato = async function(id) {
+      const nuevoNombre = prompt("Nuevo nombre:");
+      if (nuevoNombre) {
+        await updateDoc(doc(db, "miembros", id), { nombre: nuevoNombre });
+        cargarDatos();
+      }
+    }
+
+    window.cerrarSesion = async function() {
+      await signOut(auth);
+      window.location.href = "index.html";
+    }
+
+    window.onload = cargarDatos;
+  </script>
+</head>
+<body>
+  <h2>Panel de Administración</h2>
+  <input type="text" id="nombre" placeholder="Nombre del miembro">
+  <button onclick="agregarDato()">Agregar</button>
+  <button onclick="cerrarSesion()">Cerrar sesión</button>
+
+  <h3>Miembros registrados</h3>
+  <div id="lista"></div>
+</body>
+</html>
