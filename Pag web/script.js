@@ -1,513 +1,112 @@
-// Configuración e inicialización de Firebase
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// Tu configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
-    authDomain: "iglesia-cc0ab.firebaseapp.com",
-    projectId: "iglesia-cc0ab",
-    storageBucket: "iglesia-cc0ab.appspot.com",
-    messagingSenderId: "888431233122",
-    appId: "1:888431233122:web:5d76b0966283b8ef08693b",
-    measurementId: "G-4V2T4W356X"
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_DOMINIO.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_BUCKET.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
 };
 
-// Variables para Firebase - se inicializarán cuando se cargue la librería
-let app, auth, db;
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-// Variables globales para el sistema de donaciones
-let selectedMethod = '';
-
-/**
- * Inicializa Firebase una vez que se cargan los módulos
- */
-async function initializeFirebase() {
-    try {
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js");
-        const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
-        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
-        
-        app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-        
-        console.log('Firebase inicializado correctamente');
-        
-        // Manejar estado de autenticación
-        onAuthStateChanged(auth, (user) => {
-            const inventoryPanel = document.getElementById("inventory-panel");
-            if (user) {
-                // Usuario autenticado, muestra el panel
-                if (inventoryPanel) {
-                    inventoryPanel.style.display = "block";
-                }
-            } else {
-                // Usuario no autenticado, esconde panel
-                if (inventoryPanel) {
-                    inventoryPanel.style.display = "none";
-                }
-                // Solo redirigir si estamos en panel.html
-                if (window.location.pathname.includes('panel.html')) {
-                    window.location.href = "login.html";
-                }
-            }
-        });
-        
-    } catch (error) {
-        console.error('Error al inicializar Firebase:', error);
-    }
-}
-
-/**
- * Abre el modal de donaciones
- */
-function openDonationModal() {
-    const modal = document.getElementById('donationModal');
-    if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    } else {
-        console.error('Modal de donaciones no encontrado');
-    }
-}
-
-/**
- * Cierra el modal de donaciones
- */
-function closeDonationModal() {
-    const modal = document.getElementById('donationModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        resetSelection();
-    }
-}
-
-/**
- * Selecciona un método de pago
- * @param {string} method - Método de pago seleccionado
- */
-function selectMethod(method) {
-    selectedMethod = method;
-    
-    // Remover selección previa
-    const methodCards = document.querySelectorAll('.donation-method');
-    methodCards.forEach(card => card.classList.remove('selected'));
-    
-    // Agregar selección actual - buscar el card que fue clickeado
-    const clickedCard = document.querySelector(`[onclick*="${method}"]`);
-    if (clickedCard) {
-        clickedCard.classList.add('selected');
-    }
-}
-
-/**
- * Crea y muestra un modal personalizado con imagen QR
- * @param {string} message - Mensaje a mostrar
- * @param {string} qrImageUrl - URL de la imagen QR
- */
-function showQRModal(message, qrImageUrl) {
-    // Remover modal existente si existe
-    const existingModal = document.getElementById('qrModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // Crear el modal personalizado
-    const qrModal = document.createElement('div');
-    qrModal.className = 'modal';
-    qrModal.id = 'qrModal';
-    qrModal.style.display = 'block';
-    qrModal.style.position = 'fixed';
-    qrModal.style.zIndex = '1000';
-    qrModal.style.left = '0';
-    qrModal.style.top = '0';
-    qrModal.style.width = '100%';
-    qrModal.style.height = '100%';
-    qrModal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    
-    qrModal.innerHTML = `
-        <div class="modal-content" style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 10px; max-width: 600px; position: relative;">
-            <div class="modal-header" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
-                <h2 style="margin: 0; color: #2c5393;">¡Gracias por tu Donación! 💝</h2>
-                <button class="close-btn" onclick="closeQRModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
-            </div>
-            <div class="modal-body" style="text-align: center;">
-                <div style="margin-bottom: 2rem;">
-                    <h3 style="color: #2c5393; margin-bottom: 1rem;">
-                        ${getMethodName(selectedMethod)}
-                    </h3>
-                    <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
-                        <img src="${qrImageUrl}" alt="Código QR para ${getMethodName(selectedMethod)}" 
-                             style="max-width: 250px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <div style="display: none; padding: 20px; color: #666;">
-                            Imagen QR no disponible
-                        </div>
-                    </div>
-                    <div style="text-align: left; background-color: #e8f4f8; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2c5393;">
-                        <pre style="white-space: pre-wrap; font-family: 'Segoe UI', sans-serif; margin: 0; line-height: 1.6;">${message}</pre>
-                    </div>
-                </div>
-                <p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">
-                    <strong>Nota:</strong> Escanea el código QR con tu aplicación de pago o sigue las instrucciones detalladas.
-                </p>
-            </div>
-            <div class="modal-footer" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
-                <button onclick="closeQRModal()" style="width: 100%; padding: 12px; background-color: #2c5393; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                    Entendido
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(qrModal);
-    document.body.style.overflow = 'hidden';
-}
-
-/**
- * Cierra el modal de QR
- */
-function closeQRModal() {
-    const qrModal = document.getElementById('qrModal');
-    if (qrModal) {
-        qrModal.remove();
-        document.body.style.overflow = 'auto';
-    }
-}
-
-/**
- * Obtiene la URL de la imagen QR según el método de pago
- * @param {string} method - Método de pago
- * @returns {string} URL de la imagen QR (solo para Yape y Plin)
- */
-function getQRImageUrl(method) {
-    // URLs solo para Yape y Plin - reemplaza estas con las URLs reales de tus códigos QR
-    const qrUrls = {
-        'yape': 'images/qr-yape.png',
-        'plin': 'images/qr-plin.png'
-    };
-    
-    return qrUrls[method] || '';
-}
-
-/**
- * Procesa la donación y muestra las instrucciones correspondientes
- */
-function processDonation() {
-    if (!selectedMethod) {
-        alert('Por favor selecciona un método de pago.');
-        return;
-    }
-    
-    let message = `¡Gracias por tu generosidad! 🙏\n\n`;
-    message += `Método seleccionado: ${getMethodName(selectedMethod)}\n\n`;
-    
-    switch(selectedMethod) {
-        case 'yape':
-            message += `Para completar tu donación por Yape:\n`;
-            message += `1. Abre tu app Yape\n`;
-            message += `2. Escanea el QR o usa el número: 958-685-460\n`;
-            message += `3. Ingresa el monto que desees donar\n`;
-            message += `4. En el concepto escribe: "Donación Iglesia Shaddai"`;
-            
-            // Mostrar modal con QR para Yape
-            message += `\n\n¡Que Dios bendiga tu generosidad! 💝`;
-            const qrImageUrlYape = getQRImageUrl(selectedMethod);
-            showQRModal(message, qrImageUrlYape);
-            closeDonationModal();
-            return;
-            
-        case 'plin':
-            message += `Para completar tu donación por Plin:\n`;
-            message += `1. Abre tu app Plin\n`;
-            message += `2. Escanea el QR o usa el número: 958-685-460\n`;
-            message += `3. Ingresa el monto que desees donar\n`;
-            message += `4. En el concepto escribe: "Donación Iglesia Shaddai"`;
-            
-            // Mostrar modal con QR para Plin
-            message += `\n\n¡Que Dios bendiga tu generosidad! 💝`;
-            const qrImageUrlPlin = getQRImageUrl(selectedMethod);
-            showQRModal(message, qrImageUrlPlin);
-            closeDonationModal();
-            return;
-            
-        case 'bcp':
-            message += `Para completar tu donación por BCP:\n`;
-            message += `1. Cuenta de Ahorros BCP: 123-45678901-2-34\n`;
-            message += `2. A nombre de: Iglesia Bautista Shaddai\n`;
-            message += `3. Ingresa el monto que desees donar\n`;
-            message += `4. Concepto: "Donación"`;
-            break;
-        case 'interbank':
-            message += `Para completar tu donación por Interbank:\n`;
-            message += `1. Cuenta de Ahorros IBK: 987-65432109-8-76\n`;
-            message += `2. A nombre de: Iglesia Bautista Shaddai\n`;
-            message += `3. Ingresa el monto que desees donar\n`;
-            message += `4. Concepto: "Donación"`;
-            break;
-        case 'bbva':
-            message += `Para completar tu donación por BBVA:\n`;
-            message += `1. Cuenta de Ahorros BBVA: 456-78912345-6-78\n`;
-            message += `2. A nombre de: Iglesia Bautista Shaddai\n`;
-            message += `3. Ingresa el monto que desees donar\n`;
-            message += `4. Concepto: "Donación"`;
-            break;
-        case 'efectivo':
-            message += `Para completar tu donación en efectivo:\n`;
-            message += `1. Visita nuestra iglesia en los horarios de servicio\n`;
-            message += `2. Puedes entregar tu donación directamente al pastor\n`;
-            message += `3. O depositarla en las urnas de ofrenda\n`;
-            message += `4. Horarios: Dom 10AM, Mié 7PM, Vie 7PM`;
-            break;
-    }
-    
-    message += `\n\n¡Que Dios bendiga tu generosidad! 💝`;
-    
-    // Para métodos bancarios y efectivo, usar alert tradicional
-    alert(message);
-    closeDonationModal();
-}
-
-/**
- * Obtiene el nombre legible del método de pago
- * @param {string} method - Código del método de pago
- * @returns {string} Nombre del método de pago
- */
-function getMethodName(method) {
-    const names = {
-        'yape': 'Yape',
-        'plin': 'Plin',
-        'bcp': 'BCP',
-        'interbank': 'Interbank',
-        'bbva': 'BBVA',
-        'efectivo': 'Efectivo'
-    };
-    return names[method] || method;
-}
-
-/**
- * Resetea todas las selecciones del modal de donaciones
- */
-function resetSelection() {
-    selectedMethod = '';
-    
-    // Limpiar selecciones visuales
-    const methodCards = document.querySelectorAll('.donation-method');
-    methodCards.forEach(card => card.classList.remove('selected'));
-}
-
-/**
- * Función para navegación suave a las secciones
- * @param {string} sectionId - ID de la sección a la que navegar
- */
-function smoothScrollToSection(sectionId) {
-    const element = document.getElementById(sectionId);
-    if (element) {
-        element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
-}
-
-/**
- * Muestra un mensaje de confirmación antes de procesar la donación
- * @returns {boolean} true si el usuario confirma, false en caso contrario
- */
-function confirmDonation() {
-    return confirm(`¿Estás seguro de que deseas proceder con la donación mediante ${getMethodName(selectedMethod)}?`);
-}
-
-/**
- * Valida que el método de pago esté seleccionado
- * @returns {Object} Objeto con validación y mensaje de error si existe
- */
-function validateDonationData() {
-    if (!selectedMethod) {
-        return {
-            isValid: false,
-            message: 'Por favor selecciona un método de pago.'
-        };
-    }
-    
-    return {
-        isValid: true,
-        message: ''
-    };
-}
-
-/**
- * Versión mejorada del procesamiento de donaciones con validación
- */
-function processDonationImproved() {
-    const validation = validateDonationData();
-    
-    if (!validation.isValid) {
-        alert(validation.message);
-        return;
-    }
-    
-    if (confirmDonation()) {
-        processDonation();
-    }
-}
-
-/**
- * Función de inicio de sesión con Firebase
- */
-async function iniciarSesion() {
-    const email = document.getElementById("correo").value;
-    const password = document.getElementById("clave").value;
-    const errorElement = document.getElementById("errorLogin");
-
-    if (!email || !password) {
-        if (errorElement) {
-            errorElement.textContent = "Por favor completa todos los campos";
-        }
-        return;
-    }
-
-    try {
-        // Importar la función de autenticación dinámicamente
-        const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js");
-        
-        if (!auth) {
-            throw new Error('Firebase no está inicializado');
-        }
-        
-        const credenciales = await signInWithEmailAndPassword(auth, email, password);
-        console.log('Inicio de sesión exitoso:', credenciales.user);
-        
-        // Redirige a la página protegida
-        window.location.href = "panel.html";
-    } catch (error) {
-        console.error('Error de autenticación:', error);
-        
-        let errorMessage = "Error al iniciar sesión";
-        switch (error.code) {
-            case 'auth/invalid-email':
-                errorMessage = "Correo electrónico inválido";
-                break;
-            case 'auth/user-disabled':
-                errorMessage = "Usuario deshabilitado";
-                break;
-            case 'auth/user-not-found':
-                errorMessage = "Usuario no encontrado";
-                break;
-            case 'auth/wrong-password':
-                errorMessage = "Contraseña incorrecta";
-                break;
-            case 'auth/too-many-requests':
-                errorMessage = "Demasiados intentos. Intenta más tarde";
-                break;
-            case 'auth/network-request-failed':
-                errorMessage = "Error de conexión. Verifica tu internet";
-                break;
-            default:
-                errorMessage = "Correo o contraseña incorrecta";
-        }
-        
-        if (errorElement) {
-            errorElement.textContent = errorMessage;
-        }
-    }
-}
-
-/**
- * Función para el sistema de inventario
- */
-function initializeInventorySystem() {
-    const form = document.getElementById('inventory-form');
-    const tableBody = document.querySelector('#inventory-table tbody');
-
-    if (form && tableBody) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const item = {
-                nombre: document.getElementById('item-nombre').value,
-                descripcion: document.getElementById('item-descripcion').value,
-                cantidad: document.getElementById('item-cantidad').value,
-                valor: document.getElementById('item-valor').value,
-                categoria: document.getElementById('item-categoria').value,
-                ubicacion: document.getElementById('item-ubicacion').value,
-                estado: document.getElementById('item-estado').value,
-                responsable: document.getElementById('item-responsable').value,
-                compra: document.getElementById('item-compra').value
-            };
-
-            const row = document.createElement('tr');
-            for (let key in item) {
-                const cell = document.createElement('td');
-                cell.textContent = item[key];
-                row.appendChild(cell);
-            }
-
-            tableBody.appendChild(row);
-            form.reset();
-        });
-    }
-}
-
-// Event Listeners y inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar Firebase
-    initializeFirebase();
-    
-    // Inicializar sistema de inventario
-    initializeInventorySystem();
-
-    // Cerrar modal al hacer clic fuera del contenido
-    window.onclick = function(event) {
-        const modal = document.getElementById('donationModal');
-        const qrModal = document.getElementById('qrModal');
-        
-        if (event.target === modal) {
-            closeDonationModal();
-        }
-        if (event.target === qrModal) {
-            closeQRModal();
-        }
-    };
-
-    // Cerrar modal con la tecla Escape
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const modal = document.getElementById('donationModal');
-            const qrModal = document.getElementById('qrModal');
-            
-            if (qrModal && qrModal.style.display === 'block') {
-                closeQRModal();
-            } else if (modal && modal.style.display === 'block') {
-                closeDonationModal();
-            }
-        }
+// Login
+window.login = function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      window.location.href = "inventario.html";
+    })
+    .catch((error) => {
+      document.getElementById("login-error").textContent = "Credenciales incorrectas.";
     });
+};
 
-    // Agregar navegación suave a los enlaces del menú
-    const navLinks = document.querySelectorAll('nav a[href^="#"]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            smoothScrollToSection(targetId);
-        });
+const tabla = document.getElementById("tabla-body");
+const formulario = document.getElementById("formulario");
+
+function cargarDatos() {
+  getDocs(collection(db, "inventario")).then((snap) => {
+    tabla.innerHTML = "";
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${data.nombre}</td>
+        <td>${data.descripcion}</td>
+        <td>${data.cantidad}</td>
+        <td>${data.valor}</td>
+        <td>${data.categoria}</td>
+        <td>${data.ubicacion}</td>
+        <td>${data.estado}</td>
+        <td>${data.responsable}</td>
+        <td>${data.tipoCompra}</td>
+        <td>
+          <button onclick="editar('${docSnap.id}')">Editar</button>
+          <button onclick="eliminar('${docSnap.id}')">Eliminar</button>
+        </td>
+      `;
+      tabla.appendChild(fila);
     });
+  });
+}
 
-    // Event listener para el formulario de login si existe
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            iniciarSesion();
-        });
-    }
-});
+window.editar = async function (id) {
+  const ref = doc(db, "inventario", id);
+  const snap = await getDocs(collection(db, "inventario"));
+  const item = snap.docs.find((d) => d.id === id).data();
+  Object.keys(item).forEach((key) => {
+    const input = document.getElementById(key);
+    if (input) input.value = item[key];
+  });
+  formulario.onsubmit = async (e) => {
+    e.preventDefault();
+    const nuevo = {};
+    formulario.querySelectorAll("input").forEach((i) => {
+      nuevo[i.id] = i.value;
+    });
+    await updateDoc(ref, nuevo);
+    cargarDatos();
+    limpiarFormulario();
+    formulario.onsubmit = guardar;
+  };
+};
 
-// Exponer funciones necesarias globalmente para uso en HTML
-window.openDonationModal = openDonationModal;
-window.closeDonationModal = closeDonationModal;
-window.selectMethod = selectMethod;
-window.processDonation = processDonation;
-window.processDonationImproved = processDonationImproved;
-window.closeQRModal = closeQRModal;
-window.iniciarSesion = iniciarSesion;
-window.smoothScrollToSection = smoothScrollToSection;
+window.eliminar = async function (id) {
+  await deleteDoc(doc(db, "inventario", id));
+  cargarDatos();
+};
+
+window.limpiarFormulario = function () {
+  formulario.reset();
+};
+
+function guardar(e) {
+  e.preventDefault();
+  const nuevo = {};
+  formulario.querySelectorAll("input").forEach((i) => {
+    nuevo[i.id] = i.value;
+  });
+  addDoc(collection(db, "inventario"), nuevo).then(() => {
+    cargarDatos();
+    limpiarFormulario();
+  });
+}
+
+if (formulario) {
+  formulario.onsubmit = guardar;
+  cargarDatos();
+}
