@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Inventario</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to bottom, #b3d9f5, #ffffff);
+      padding: 30px;
+      text-align: center;
+    }
+    .formulario, .tabla {
+      background: #fff;
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .editar {
+      color: blue;
+      cursor: pointer;
+    }
+    .eliminar {
+      color: red;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Sistema de Inventario</h2>
+  <div class="formulario">
+    <h3>Agregar ítem</h3>
+    <form id="formulario">
+      <input type="text" id="nombre" placeholder="Nombre" required>
+      <input type="text" id="descripcion" placeholder="Descripción">
+      <input type="number" id="cantidad" placeholder="Cantidad" value="1">
+      <input type="number" id="valor" placeholder="Valor Unitario" value="0">
+      <select id="categoria">
+        <option>Mueble</option>
+        <option>Electrónico</option>
+        <option>Otro</option>
+      </select>
+      <input type="text" id="ubicacion" placeholder="Ubicación">
+      <select id="estado">
+        <option>Disponible</option>
+        <option>No disponible</option>
+      </select>
+      <input type="text" id="responsable" placeholder="Responsable">
+      <button type="submit">Guardar</button>
+    </form>
+  </div>
+
+  <div class="tabla">
+    <h3>Lista de ítems</h3>
+    <table border="1" width="100%">
+      <thead>
+        <tr>
+          <th>Nombre</th><th>Descripción</th><th>Cantidad</th><th>Valor</th><th>Categoría</th><th>Ubicación</th><th>Estado</th><th>Responsable</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="listaItems"></tbody>
+    </table>
+  </div>
+
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyBI3jGzTepzw4uUCFzwS5izwGB61pEHsPU",
+  authDomain: "iglesia-cc0ab.firebaseapp.com",
+  projectId: "iglesia-cc0ab",
+  storageBucket: "iglesia-cc0ab.firebasestorage.app",
+  messagingSenderId: "888431233122",
+  appId: "1:888431233122:web:5d76b0966283b8ef08693b",
+  measurementId: "G-4V2T4W356X"
+};
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const itemsRef = db.collection("inventario");
+
+  const formulario = document.getElementById("formulario");
+  const listaItems = document.getElementById("listaItems");
+  let editandoId = null;
+
+  formulario.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const datos = {
+      nombre: nombre.value,
+      descripcion: descripcion.value,
+      cantidad: +cantidad.value,
+      valor: +valor.value,
+      categoria: categoria.value,
+      ubicacion: ubicacion.value,
+      estado: estado.value,
+      responsable: responsable.value,
+    };
+    if (editandoId) {
+      await itemsRef.doc(editandoId).update(datos);
+      editandoId = null;
+    } else {
+      await itemsRef.add(datos);
+    }
+    formulario.reset();
+  });
+
+  function renderItem(doc) {
+    const data = doc.data();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${data.nombre}</td>
+      <td>${data.descripcion}</td>
+      <td>${data.cantidad}</td>
+      <td>${data.valor}</td>
+      <td>${data.categoria}</td>
+      <td>${data.ubicacion}</td>
+      <td>${data.estado}</td>
+      <td>${data.responsable}</td>
+      <td>
+        <span class="editar" onclick="editarItem('${doc.id}')">Editar</span> |
+        <span class="eliminar" onclick="eliminarItem('${doc.id}')">Eliminar</span>
+      </td>
+    `;
+    listaItems.appendChild(tr);
+  }
+
+  function editarItem(id) {
+    itemsRef.doc(id).get().then(doc => {
+      const d = doc.data();
+      nombre.value = d.nombre;
+      descripcion.value = d.descripcion;
+      cantidad.value = d.cantidad;
+      valor.value = d.valor;
+      categoria.value = d.categoria;
+      ubicacion.value = d.ubicacion;
+      estado.value = d.estado;
+      responsable.value = d.responsable;
+      editandoId = id;
+    });
+  }
+
+  function eliminarItem(id) {
+    itemsRef.doc(id).delete();
+  }
+
+  itemsRef.onSnapshot(snapshot => {
+    listaItems.innerHTML = "";
+    snapshot.forEach(doc => renderItem(doc));
+  });
+</script>
+</body>
+</html>
